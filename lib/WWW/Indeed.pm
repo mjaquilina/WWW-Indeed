@@ -21,11 +21,12 @@ WWW::Indeed - Perl interface to the Indeed.com web service
   my @postings = $indeed->get_postings(
       'Project Manager',
       location => 'New York, NY',
-      country  => 'US',
+      country  => 'us',
       sort     => 'date',
       limit    => 25,
       days     => 14,
       filter   => 1,
+      version  => 2,
   );
 
   for my $posting (@postings) {
@@ -100,6 +101,12 @@ Whether or not to filter out duplicate postings.
 
 Defaults to 0.
 
+=item * B<version>
+
+Which version of the API to use.
+
+Defaults to 2.
+
 =back
 
 =cut 
@@ -112,13 +119,14 @@ sub get_postings
     my $offset = $params{offset} || 0;
 
     my %query = (
-        key     => $self->{api_key}  || '',
-        q       => $query            || '',
-        l       => $params{location} || '',
-        sort    => $params{sort}     || 'date',
-        start   => $offset,
-        limit   => $params{limit}    || 20,
-        co      => $params{country}  || '',
+        publisher => $self->{api_key}  || '',
+        q         => $query            || '',
+        l         => $params{location} || '',
+        sort      => $params{sort}     || 'date',
+        start     => $offset,
+        limit     => $params{limit}    || 20,
+        co        => $params{country}  || '',
+        v         => $params{version}  || 2,
 
         # surprisingly, this has nothing to do with cheese - it's the "from
         # age" in days
@@ -217,7 +225,7 @@ sub api_call
     my $self       = shift;
     my %params     = @_;
     my @uri_params = map("$_=$params{$_}", keys %params);
-    my $uri        = "http://api.indeed.com/apisearch?" . join('&', @uri_params);
+    my $uri        = "http://api.indeed.com/ads/apisearch?".join('&', @uri_params);
     my $agent      = LWP::UserAgent->new;
     my $response   = $agent->get($uri);
     if ($response->is_success)
