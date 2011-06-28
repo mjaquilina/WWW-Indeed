@@ -109,7 +109,7 @@ sub get_postings
     my ($self, $query, %params) = @_;
 
     my @nice_postings;
-    my $offset = 0;
+    my $offset = $params{offset} || 0;
 
     my %query = (
         key     => $self->{api_key}  || '',
