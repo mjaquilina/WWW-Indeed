@@ -21,6 +21,7 @@ WWW::Indeed - Perl interface to the Indeed.com web service
   my @postings = $indeed->get_postings(
       'Project Manager',
       location => 'New York, NY',
+      country  => 'US',
       sort     => 'date',
       limit    => 25,
       days     => 14,
@@ -72,6 +73,10 @@ Defaults to 20.
 The location where the job postings should be located. Use a postal/ZIP code or
 a city and state for best results.
 
+=item * B<country>
+
+The country where the job postings should be located. Defaults to US.
+
 =item * B<sort>
 
 What the results should be sorted by - one of 'relevance' or 'date'.
@@ -113,6 +118,7 @@ sub get_postings
         sort    => $params{sort}     || 'date',
         start   => $offset,
         limit   => $params{limit}    || 20,
+        co      => $params{country}  || '',
 
         # surprisingly, this has nothing to do with cheese - it's the "from
         # age" in days
@@ -249,6 +255,10 @@ This code is free software; you can redistribute it and/or modify it under the s
 =head1 AUTHOR
 
 Michael Aquilina, aquilina@cpan.org
+
+=head1 CONTRIBUTORS
+
+Adam Taylor, ajct@cpan.org
 
 =cut
 
