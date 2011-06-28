@@ -6,7 +6,7 @@ use POSIX qw(ceil);
 use LWP::UserAgent;
 use XML::Simple qw(XMLin);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
