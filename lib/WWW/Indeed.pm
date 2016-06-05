@@ -6,7 +6,7 @@ use POSIX qw(ceil);
 use LWP::UserAgent;
 use XML::Simple qw(XMLin);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -21,10 +21,12 @@ WWW::Indeed - Perl interface to the Indeed.com web service
   my @postings = $indeed->get_postings(
       'Project Manager',
       location => 'New York, NY',
+      country  => 'us',
       sort     => 'date',
       limit    => 25,
       days     => 14,
       filter   => 1,
+      version  => 2,
   );
 
   for my $posting (@postings) {
@@ -72,6 +74,10 @@ Defaults to 20.
 The location where the job postings should be located. Use a postal/ZIP code or
 a city and state for best results.
 
+=item * B<country>
+
+The country where the job postings should be located. Defaults to US.
+
 =item * B<sort>
 
 What the results should be sorted by - one of 'relevance' or 'date'.
@@ -95,6 +101,12 @@ Whether or not to filter out duplicate postings.
 
 Defaults to 0.
 
+=item * B<version>
+
+Which version of the API to use.
+
+Defaults to 2.
+
 =back
 
 =cut 
@@ -104,15 +116,17 @@ sub get_postings
     my ($self, $query, %params) = @_;
 
     my @nice_postings;
-    my $offset = 0;
+    my $offset = $params{offset} || 0;
 
     my %query = (
-        key     => $self->{api_key}  || '',
-        q       => $query            || '',
-        l       => $params{location} || '',
-        sort    => $params{sort}     || 'date',
-        start   => $offset,
-        limit   => $params{limit}    || 20,
+        publisher => $self->{api_key}  || '',
+        q         => $query            || '',
+        l         => $params{location} || '',
+        sort      => $params{sort}     || 'date',
+        start     => $offset,
+        limit     => $params{limit}    || 20,
+        co        => $params{country}  || '',
+        v         => $params{version}  || 2,
 
         # surprisingly, this has nothing to do with cheese - it's the "from
         # age" in days
@@ -211,7 +225,7 @@ sub api_call
     my $self       = shift;
     my %params     = @_;
     my @uri_params = map("$_=$params{$_}", keys %params);
-    my $uri        = "http://api.indeed.com/apisearch?" . join('&', @uri_params);
+    my $uri        = "http://api.indeed.com/ads/apisearch?".join('&', @uri_params);
     my $agent      = LWP::UserAgent->new;
     my $response   = $agent->get($uri);
     if ($response->is_success)
@@ -249,6 +263,10 @@ This code is free software; you can redistribute it and/or modify it under the s
 =head1 AUTHOR
 
 Michael Aquilina, aquilina@cpan.org
+
+=head1 CONTRIBUTORS
+
+Adam Taylor, ajct@cpan.org
 
 =cut
 
